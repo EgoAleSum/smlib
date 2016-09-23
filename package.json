@@ -1,0 +1,19 @@
+{
+  "name": "smlib",
+  "version": "0.0.1",
+  "description": "Shared libraries and utilities",
+  "author": "SixthMonkey",
+  "license": "All Rights Reserved",
+  "private": true,
+  "dependencies": {
+    "moment": "2.15.x",
+    "moment-timezone": "0.5.x",
+    "unorm": "1.4.x",
+    "validator": "5.7.x",
+    "xregexp": "3.1.x"
+  },
+  "devDependencies": {
+    "mocha": "3.0.x",
+    "should": "11.1.x"
+  }
+}
