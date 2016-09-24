@@ -8,7 +8,7 @@ describe('SMHelper.js', () => {
 
     it('SMHelper should export an object with helper methods', () => {
         SMHelper.should.be.type('object')
-        Object.keys(SMHelper).should.have.lengthOf(12)
+        Object.keys(SMHelper).should.have.lengthOf(13)
 
         SMHelper.buildQuerystring.should.be.type('function')
         SMHelper.buildUrl.should.be.type('function')
@@ -21,6 +21,7 @@ describe('SMHelper.js', () => {
         SMHelper.pregQuote.should.be.type('function')
         SMHelper.strIs.should.be.type('function')
         SMHelper.stringToCamel.should.be.type('function')
+        SMHelper.stripTags.should.be.type('function')
         SMHelper.updatePropertyInObject.should.be.type('function')
     })
 
@@ -277,6 +278,18 @@ describe('SMHelper.js', () => {
         SMHelper.stringToCamel('hello-world').should.be.equal('helloWorld')
         SMHelper.stringToCamel('helloWorld').should.be.equal('helloWorld')
         SMHelper.stringToCamel('hello world').should.be.equal('hello world')
+    })
+
+    it('stripTags should return a string with HTML tags stripped', () => {
+        SMHelper.stripTags('<b>tag</b>').should.be.equal('tag')
+
+        SMHelper.stripTags('<p>Kevin</p> <br /><b>van</b> <i>Zonneveld</i>', '<i><b>').should.be.equal('Kevin <b>van</b> <i>Zonneveld</i>')
+        SMHelper.stripTags('<p>Kevin <img src="someimage.png" onmouseover="some()">van <i>Zonneveld</i></p>', '<p>').should.be.equal('<p>Kevin van Zonneveld</p>')
+        SMHelper.stripTags("<a href='http://kevin.vanzonneveld.net'>Kevin van Zonneveld</a>", "<a>").should.be.equal("<a href='http://kevin.vanzonneveld.net'>Kevin van Zonneveld</a>")
+        SMHelper.stripTags('1 < 5 5 > 1').should.be.equal('1 < 5 5 > 1')
+        SMHelper.stripTags('1 <br/> 1').should.be.equal('1  1')
+        SMHelper.stripTags('1 <br/> 1', '<br>').should.be.equal('1 <br/> 1')
+        SMHelper.stripTags('1 <br/> 1', '<br><br/>').should.be.equal('1 <br/> 1')
     })
 
     it('updatePropertyInObject should update the specified property in the object', () => {
