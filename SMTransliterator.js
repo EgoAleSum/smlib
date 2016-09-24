@@ -10,9 +10,10 @@ const SMTransliterator = {
     /**
      * Removes diacritics from strings.
      * In full mode, removes punctuation characters and characters in the "Other" Unicode plane (control characters, unassigned ones, etc).
+     * 
      * @param {string} str - Source string
-     * @param {boolean} full - Enable full mode
-     * @return {string} The translitereated string
+     * @param {boolean} [full=false] - Enable full mode
+     * @returns {string} The translitereated string
      */
     Transliterate: (str, full) => {
         // 1. Decompose Unicode sequences
@@ -35,9 +36,10 @@ const SMTransliterator = {
     /**
      * Short-hand method that performs transliterate and lowercases the string.
      * In full mode, removes punctuation characters and characters in the "Other" Unicode plane (control characters, unassigned ones, etc).
+     * 
      * @param {string} str - Source string
-     * @param {boolean} full - Enable full mode
-     * @return {string} The normalized string
+     * @param {boolean} [full=false] - Enable full mode
+     * @returns {string} The normalized string
      */
     Normalize: (str, full) => {
         str = SMTransliterator.Transliterate(str, full)
