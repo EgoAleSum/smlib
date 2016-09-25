@@ -316,6 +316,28 @@ const SMHelper = {
 	},
 
     /**
+     * Converts a value to string, ensuring that the number 0 and the boolean false are treated correctly
+     * 
+     * @param {*} val - Value to convert
+     * @returns {string} String value
+     */
+    toStringSafe: (val) => {
+        // Ensure str is a string
+        if(typeof val == 'number' && !isNaN(val)) {
+            // Numbers have a special treatment to avoid having 0 converted to null
+            val = val.toString()
+        }
+        else if(val === false) {
+            val = 'false'
+        }
+        else {
+            val = val ? val + '' : ''
+        }
+
+        return val
+    },
+
+    /**
      * Updates a property (represented in the "dot notation") in an object.
      * The object is modified.
      * 

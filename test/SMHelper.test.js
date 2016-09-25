@@ -8,7 +8,7 @@ describe('SMHelper.js', () => {
 
     it('SMHelper should export an object with helper methods', () => {
         SMHelper.should.be.type('object')
-        Object.keys(SMHelper).should.have.lengthOf(13)
+        Object.keys(SMHelper).should.have.lengthOf(14)
 
         SMHelper.buildQuerystring.should.be.type('function')
         SMHelper.buildUrl.should.be.type('function')
@@ -22,6 +22,7 @@ describe('SMHelper.js', () => {
         SMHelper.strIs.should.be.type('function')
         SMHelper.stringToCamel.should.be.type('function')
         SMHelper.stripTags.should.be.type('function')
+        SMHelper.toStringSafe.should.be.type('function')
         SMHelper.updatePropertyInObject.should.be.type('function')
     })
 
@@ -290,6 +291,19 @@ describe('SMHelper.js', () => {
         SMHelper.stripTags('1 <br/> 1').should.be.equal('1  1')
         SMHelper.stripTags('1 <br/> 1', '<br>').should.be.equal('1 <br/> 1')
         SMHelper.stripTags('1 <br/> 1', '<br><br/>').should.be.equal('1 <br/> 1')
+    })
+
+    it('toStringSafe should convert values to string', () => {
+        SMHelper.toStringSafe('hello world').should.be.equal('hello world')
+        SMHelper.toStringSafe(100).should.be.equal('100')
+        SMHelper.toStringSafe(null).should.be.equal('')
+        SMHelper.toStringSafe(0).should.be.equal('0')
+        SMHelper.toStringSafe(false).should.be.equal('false')
+        SMHelper.toStringSafe(true).should.be.equal('true')
+        SMHelper.toStringSafe(undefined).should.be.equal('')
+        SMHelper.toStringSafe(Infinity).should.be.equal('Infinity')
+        SMHelper.toStringSafe(-Infinity).should.be.equal('-Infinity')
+        SMHelper.toStringSafe(new Date('2016-02-29T11:55:00-05:00')).should.be.equal('Mon Feb 29 2016 11:55:00 GMT-0500 (EST)')
     })
 
     it('updatePropertyInObject should update the specified property in the object', () => {
