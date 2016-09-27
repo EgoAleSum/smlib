@@ -80,22 +80,22 @@ let SMClean = {
      * @returns {string|null} Cleaned email address or `null` 
      */
     email: (val) => {
-		val = SMClean.string(val, {keepHTML: false, keepNewLines: false})
-		if(!val) {
+        val = SMClean.string(val, {keepHTML: false, keepNewLines: false})
+        if(!val) {
             return null
         }
-		
-		// Check if it's a valid email address
-		if(!validator.isEmail(val)) {
+        
+        // Check if it's a valid email address
+        if(!validator.isEmail(val)) {
             return null
         }
-		
-		// Lowercase the domain
-		let parts = val.split('@', 2)
-		parts[1] = parts[1].toLowerCase()
-		
-		return parts.join('@') || null
-	},
+        
+        // Lowercase the domain
+        let parts = val.split('@', 2)
+        parts[1] = parts[1].toLowerCase()
+        
+        return parts.join('@') || null
+    },
 
     /**
      * Cleans a string representing a floating point number.
@@ -149,25 +149,25 @@ let SMClean = {
      * @param {*} val - Value to clean
      * @returns {string|null} Cleaned, valid password or `null`
      */
-	password: (val) => {
-		if(!val) {
+    password: (val) => {
+        if(!val) {
             return null
         }
 
         // Ensure it's a string
         val = SMHelper.toStringSafe(val)
-		
-		// Allow only ASCII characters between 0x21 and 0x7E, excluding control characters
-		val = unorm.nfd(val) // Normalize to NFD before removing Unicode characters
-		val = validator.whitelist(val, '\x21-\x7E')
-		
-		// Require 8 characters or longer, up to 30
-		if(val.length < 8 || val.length > 30) {
-			return null
-		}
-		
-		return val || null
-	},
+        
+        // Allow only ASCII characters between 0x21 and 0x7E, excluding control characters
+        val = unorm.nfd(val) // Normalize to NFD before removing Unicode characters
+        val = validator.whitelist(val, '\x21-\x7E')
+        
+        // Require 8 characters or longer, up to 30
+        if(val.length < 8 || val.length > 30) {
+            return null
+        }
+        
+        return val || null
+    },
 
     /**
      * Cleans a string:
@@ -184,39 +184,39 @@ let SMClean = {
      * @param {number} [options.maxLength=0] - If set to a positive integer, rejects strings longer than this
      * @returns {string} Cleaned string
      */
-	string: (val, options) => {
+    string: (val, options) => {
         // Ensure options is a valid object
         if(!options || typeof options != 'object') {
             options = {}
         }
 
         // Ensure it's a string
-		val = SMHelper.toStringSafe(val)
+        val = SMHelper.toStringSafe(val)
 
         // If string casts to false, return an empty string
-		if(!val) {
+        if(!val) {
             return ''
         }
-		
-		// Normalize the string
-		val = unorm.nfc(val)
-		if(!val) {
+        
+        // Normalize the string
+        val = unorm.nfc(val)
+        if(!val) {
             return ''
         }
-		
-		// Trim whitespaces
-		val = val.trim()
-		if(!val) {
+        
+        // Trim whitespaces
+        val = val.trim()
+        if(!val) {
             return ''
         }
-		
-		// Strip control characters
-		val = validator.stripLow(val, options.keepNewLines)
-		
-		// Encode HTML special chars unless we need them
-		if(!options.keepHTML) {
-			val = validator.escape(val)
-		}
+        
+        // Strip control characters
+        val = validator.stripLow(val, options.keepNewLines)
+        
+        // Encode HTML special chars unless we need them
+        if(!options.keepHTML) {
+            val = validator.escape(val)
+        }
 
         // Force minimum and maximum length
         if(options.minLength && options.minLength > 0 && val && val.length < options.minLength) {
@@ -225,9 +225,9 @@ let SMClean = {
         if(options.maxLength && options.maxLength > 0 && val && val.length > options.maxLength) {
             val = ''
         }
-		
-		return val || ''
-	},
+        
+        return val || ''
+    },
 
     /**
      * Cleans a time and date representation, either a UNIX timestamp or a ISO 8601 full date.
