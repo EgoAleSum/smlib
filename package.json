@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "description": "Shared libraries and utilities",
   "author": "SixthMonkey",
-  "license": "All Rights Reserved",
-  "private": true,
+  "license": "BSD-2-Clause",
   "dependencies": {
     "moment": "2.15.x",
     "moment-timezone": "0.5.x",
