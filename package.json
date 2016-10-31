@@ -9,7 +9,7 @@
     "moment": "2.15.x",
     "moment-timezone": "0.5.x",
     "unorm": "1.4.x",
-    "validator": "6.0.x",
+    "validator": "6.1.x",
     "xregexp": "3.1.x"
   },
   "devDependencies": {
