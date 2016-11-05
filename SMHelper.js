@@ -262,16 +262,16 @@ const SMHelper = {
     },
 
     /**
-     * Converts dashed strings (eg. 'foo-bar') to camelCase ('fooBar')
+     * Converts strings with dashes or underscores (eg. 'foo-bar' or 'foo_bar') to camelCase ('fooBar')
      * 
-     * Source: http://jamesroberts.name/blog/2010/02/22/string-functions-for-javascript-trim-to-camel-case-to-dashed-and-to-underscore/comment-page-1/
+     * Adapted from: http://jamesroberts.name/blog/2010/02/22/string-functions-for-javascript-trim-to-camel-case-to-dashed-and-to-underscore/comment-page-1/
      * 
      * @param {string} str - Dashed string
      * @returns {string} String converted to camelCase
      */ 
     stringToCamel: (str) => {
-        return str.replace(/(\-[a-z])/g, ($1) => {
-            return $1.toUpperCase().replace('-', '')
+        return str.replace(/(\-[a-z0-9]|_[a-z0-9])/g, ($1) => {
+            return $1.toUpperCase().replace(/\-|_/g, '')
         })
     },
 

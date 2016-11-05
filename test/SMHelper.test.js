@@ -294,10 +294,13 @@ describe('SMHelper.js', () => {
         SMHelper.strIs('foo?bar', 'fobar').should.be.false
     })
 
-    it('stringToCamel should convert dashed strings to camelCase', () => {
+    it('stringToCamel should convert strings to camelCase, splitting words on dashes or underscores', () => {
         SMHelper.stringToCamel('').should.be.equal('')
         SMHelper.stringToCamel('aa').should.be.equal('aa')
         SMHelper.stringToCamel('hello-world').should.be.equal('helloWorld')
+        SMHelper.stringToCamel('hello_world').should.be.equal('helloWorld')
+        SMHelper.stringToCamel('hello-world-a-1').should.be.equal('helloWorldA1')
+        SMHelper.stringToCamel('hello_world_a_1').should.be.equal('helloWorldA1')
         SMHelper.stringToCamel('helloWorld').should.be.equal('helloWorld')
         SMHelper.stringToCamel('hello world').should.be.equal('hello world')
     })
