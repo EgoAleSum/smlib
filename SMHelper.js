@@ -150,6 +150,21 @@ const SMHelper = {
     },
 
     /**
+     * Checks if a value is a plain object.
+     * 
+     * Source: http://stackoverflow.com/a/38555871/192024
+     * 
+     * @param {*} obj - Value to analyze
+     * @returns {boolean} True if value is a plain object
+     */
+    isPlainObject: (obj) => {
+        return	typeof obj === 'object'
+            && obj !== null
+            && obj.constructor === Object
+            && Object.prototype.toString.call(obj) === '[object Object]'
+    },
+
+    /**
      * Checks if a value is of a scalar type (string, number, boolean).
      * 
      * Source: http://www.jsoneliners.com/function/is-scalar/

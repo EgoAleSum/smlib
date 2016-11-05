@@ -8,7 +8,7 @@ describe('SMHelper.js', () => {
 
     it('SMHelper should export an object with helper methods', () => {
         SMHelper.should.be.type('object')
-        Object.keys(SMHelper).should.have.lengthOf(14)
+        Object.keys(SMHelper).should.have.lengthOf(15)
 
         SMHelper.buildQuerystring.should.be.type('function')
         SMHelper.buildUrl.should.be.type('function')
@@ -17,6 +17,7 @@ describe('SMHelper.js', () => {
         SMHelper.getDescendantProperty.should.be.type('function')
         SMHelper.isNumeric.should.be.type('function')
         SMHelper.isScalar.should.be.type('function')
+        SMHelper.isPlainObject.should.be.type('function')
         SMHelper.objectToDotNotation.should.be.type('function')
         SMHelper.pregQuote.should.be.type('function')
         SMHelper.strIs.should.be.type('function')
@@ -195,6 +196,26 @@ describe('SMHelper.js', () => {
         assert.equal(t([42]), false, "Array with one number")
         assert.equal(t(function () { }), false, "Instance of a function")
         assert.equal(t(new Date()), false, "Instance of a Date")
+    })
+
+    it('isPlainObject should identify plain objects', () => {
+        let t = SMHelper.isPlainObject
+
+        assert.equal(t({}), true, "Empty object")
+        assert.equal(t({a: 1}), true, "Object")
+        assert.equal(t({a: {b: 2}}), true, "Nested object")
+        assert.equal(t({a: []}), true, "Array inside object")
+
+        assert.equal(t(10), false, "Number primitive")
+        assert.equal(t('Hello world'), false, "String primitive")
+        assert.equal(t(null), false, "Null")
+        assert.equal(t([10]), false, "Array")
+        assert.equal(t([]), false, "Empty Array")
+        assert.equal(t(Object.create(null)), false, "Object.create(null)")
+        assert.equal(t(new (function Foo(){})()), false, "Instance of other object")
+        assert.equal(t(new Number(6)), false, "Number object")
+        assert.equal(t(new String('Hello world')), false, "String object")
+        assert.equal(t(Math), false, "Built-in Math")
     })
 
     it('isScalar should identify scalar types', () => {
