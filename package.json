@@ -6,6 +6,8 @@
   "license": "BSD-2-Clause",
   "repository": "EgoAleSum/smlib",
   "dependencies": {
+    "hjson": "2.3.x",
+    "js-yaml": "3.6.x",
     "moment": "2.15.x",
     "moment-timezone": "0.5.x",
     "unorm": "1.4.x",

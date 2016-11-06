@@ -2,6 +2,8 @@
 
 const os = require('os')
 const fs = require('fs')
+const yaml = require('js-yaml')
+const hjson = require('hjson')
 const SMHelper = require('./SMHelper')
 
 /**
@@ -13,7 +15,8 @@ class SMConfig {
 	 * Determines the environment, then sets the appropriate configuration.
 	 * 
 	 * The `config` parameter can be an object with the configuration values,
-	 * or a string representing a JSON/YAML file to load.
+	 * or a string representing a JSON/YAML/Hjson file to load. File type is
+	 * determined by the extension: *.json, *.yml/*.yaml, *.hjson
 	 * 
 	 * The configuration object should have the following structure:
 	 *   
@@ -62,50 +65,44 @@ class SMConfig {
 	 * @param {string} [envVarPrefix] - Prefix for environmental variables (default: `APPSETTING_`)
 	 */
 	constructor(config, env, envVarPrefix) {
-		// Ensure the config object is valid
-		if(!config || !SMHelper.isPlainObject(config)) {
-			throw Error('Parameter `config` must be an object')
+		// Ensure the config object is set
+		if(!config) {
+			throw Error('Parameter config must be set')
 		}
-		if(!config.default || !SMHelper.isPlainObject(config.default)) {
-			throw Error('Cannot find default environment configuration in `config` parameter')
+		if(typeof config != 'string' && !SMHelper.isPlainObject(config)) {
+			throw Error('Parameter config must be a string or an object')
+		}
+
+		// If config is a string, load the file; otherwise, config is an object
+		// that already contains the configuration
+		let configData = (typeof config == 'string')
+			? this._loadConfigFile(config)
+			: config
+
+		// Ensure configData contains the default configuration
+		if(!configData.default || !SMHelper.isPlainObject(configData.default)) {
+			throw Error('Cannot find default environment configuration in config parameter')
 		}
 
 		// Default value for envVarPrefix
 		envVarPrefix = envVarPrefix ? SMHelper.toStringSafe(envVarPrefix) : 'APPSETTING_'
 
 		// Get the name of the current environment
-		this._environment = this._getEnvironment(env, config.hostnames)
+		this._environment = this._getEnvironment(env, configData.hostnames)
 
-		// Check if we have environment-specific configuration
-		if(config[this.environment] && SMHelper.isPlainObject(config[this.environment])) {
-			// Merge configuration: environment-specific one overrides default
-			this._config = Object.assign({}, config.default, config[this.environment])
-		}
-		else {
-			// Default configuration only
-			this._config = config.default
-		}
+		// Load environmental-specific configuration
+		let envConfig = (configData[this.environment] && SMHelper.isPlainObject(configData[this.environment]))
+			? configData[this.environment]
+			: {}
 
-		// Loop through environmental variables that can override configuration
-		for(let key in process.env) {
-			if(!process.env.hasOwnProperty(key)) {
-				continue
-			}
+		// Lastly, load configuration from environmental variables
+		let envVars = this._loadEnvironmentalVariables(envVarPrefix)
 
-			// String.startsWith is available only in Node 6+
-			if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
-				// Convert the key to the right format
-				let keyCamelCase = key.substr(envVarPrefix.length)
-				let value = process.env[key]
-
-				// Check if value is a numeric string, then convert to number (float)
-				if(SMHelper.isNumeric(value)) {
-					value = parseFloat(value)
-				}
-
-				this._config[keyCamelCase] = value
-			}
-		}
+		// Merge all the configuration, in order of priority:
+		// 1. Runtime environmental variables
+		// 2. Environment config
+		// 3. Default config
+		this._config = Object.assign({}, configData.default, envConfig, envVars) 
 	}
 
 	/**
@@ -116,6 +113,35 @@ class SMConfig {
 	}
 
 	/* !Private methods */
+
+	// Load config data from file
+	_loadConfigFile(filename) {
+		// Check if file exists
+		if(!fs.existsSync(filename)) {
+			throw Error('Configuration file doesn\'t exist')
+		}
+
+		// Determine file type by extension
+		let fileType = filename.split('.').pop().toLowerCase()
+
+		let configData
+		if(fileType == 'json') {
+			configData = JSON.parse(fs.readFileSync(filename, 'utf8'))
+		}
+		else if(fileType == 'yml' || fileType == 'yaml') {
+			configData = yaml.load(fs.readFileSync(filename, 'utf8'))
+		}
+		else if(fileType == 'hjson') {
+			configData = hjson.parse(fs.readFileSync(filename, 'utf8'))
+		}
+		else {
+			throw Error('Invalid config file format')
+		}
+
+		console.log('Config data', configData)
+
+		return configData
+	}
 
 	// Get the current environment
 	_getEnvironment(env, hostnames) {
@@ -175,6 +201,34 @@ class SMConfig {
 
 		// 4. Fallback to the default environment
 		return 'default'
+	}
+
+	// Load additional configuration from environmental variables
+	_loadEnvironmentalVariables(envVarPrefix) {
+		let result = {}
+
+		// Loop through environmental variables that can override configuration
+		for(let key in process.env) {
+			if(!process.env.hasOwnProperty(key)) {
+				continue
+			}
+
+			// String.startsWith is available only in Node 6+
+			if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
+				// Convert the key to the right format
+				let keyCamelCase = key.substr(envVarPrefix.length)
+				let value = process.env[key]
+
+				// Check if value is a numeric string, then convert to number (float)
+				if(SMHelper.isNumeric(value)) {
+					value = parseFloat(value)
+				}
+
+				result[keyCamelCase] = value
+			}
+		}
+
+		return result
 	}
 }
 
