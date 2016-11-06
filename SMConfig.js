@@ -18,6 +18,12 @@ class SMConfig {
 	 * or a string representing a JSON/YAML/Hjson file to load. File type is
 	 * determined by the extension: *.json, *.yml/*.yaml, *.hjson
 	 * 
+	 * When using YAML files, you can also represent additional JavaScript
+	 * typtes that are not allowed by JSON and Hjson:
+	 * - RegExp: `!!js/regexp /pattern/gim`
+	 * - Functions: `!!js/function 'function () {...}'`
+	 * - Undefined: `!!js/undefined ''`
+	 * 
 	 * The configuration object should have the following structure:
 	 *   
 	 *   default: (Default configuration, for all environments)
@@ -115,9 +121,16 @@ class SMConfig {
 	/**
 	 * All configuration parameters (read-only)
 	 */
-	get allConfig() {
+	get all() {
 		return this._config
-	} 
+	}
+
+	/**
+	 * Return value for key from configuration
+	 */
+	get(key) {
+		return this._config[key]
+	}
 
 	/* !Private methods */
 
@@ -144,8 +157,6 @@ class SMConfig {
 		else {
 			throw Error('Invalid config file format')
 		}
-
-		console.log('Config data', configData)
 
 		return configData
 	}
