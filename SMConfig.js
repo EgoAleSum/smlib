@@ -106,11 +106,18 @@ class SMConfig {
 	}
 
 	/**
-	 * Getter function for the environment property
+	 * Environment name
 	 */
 	get environment() {
 		return this._environment
 	}
+
+	/**
+	 * All configuration parameters (read-only)
+	 */
+	get allConfig() {
+		return this._config
+	} 
 
 	/* !Private methods */
 
@@ -216,7 +223,7 @@ class SMConfig {
 			// String.startsWith is available only in Node 6+
 			if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
 				// Convert the key to the right format
-				let keyCamelCase = key.substr(envVarPrefix.length)
+				let keyCamelCase = SMHelper.stringToCamel(key.substr(envVarPrefix.length).toLowerCase())
 				let value = process.env[key]
 
 				// Check if value is a numeric string, then convert to number (float)

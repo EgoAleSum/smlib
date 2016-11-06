@@ -4,6 +4,7 @@ const should = require('should')
 const assert = require('assert')
 const os = require('os')
 const SMConfig = require('../SMConfig')
+const SMHelper = require('../SMHelper')
 
 describe('SMConfig.js', () => {
 
@@ -22,7 +23,27 @@ describe('SMConfig.js', () => {
 
         // Sample configuration object
         let params = {
-            default: {},
+            default: {
+                foo: 'bar',
+                hello: 'world',
+                number: 6,
+                ary: [0, 1, 1, 2, 3, 5, 8, 13, 21],
+                obj: {
+                    x: 1,
+                    y: 2
+                }
+            },
+            testenv1: {
+                hello: 'mondo',
+                obj: {
+                    z: 3
+                },
+                add: 'me'
+            },
+            testenv2: {
+                ary: [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
+                first: 'last'
+            },
             hostnames: {
                 testenv1: [
                     'a--not-found'
@@ -32,6 +53,29 @@ describe('SMConfig.js', () => {
                     /\-\-still(.*?)notfound/
                 ]
             }
+        }
+
+        // Expected configuration for testenv1 and testenv2
+        let testenv1Expect = {
+            foo: 'bar',
+            hello: 'mondo',
+            number: 6,
+            ary: [0, 1, 1, 2, 3, 5, 8, 13, 21],
+            obj: {
+                z: 3
+            },
+            add: 'me'
+        }
+        let testenv2Expect = {
+            foo: 'bar',
+            hello: 'world',
+            number: 6,
+            ary: [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
+            obj: {
+                x: 1,
+                y: 2
+            },
+            first: 'last'
         }
 
         // Current machine's hostname
@@ -146,6 +190,50 @@ describe('SMConfig.js', () => {
 
             let config = new SMConfig(params, 'passedenv')
             assert.equal(config.environment, 'passedenv')
+        })
+
+        it('Configuration: load default configuration', () => {
+            let config = new SMConfig(params, 'nonexisting')
+            assert.deepStrictEqual(config.allConfig, params.default)
+        })
+
+        it('Configuration: load configuration for specific environment', () => {
+            let config
+
+            config = new SMConfig(params, 'testenv1')
+            assert.deepStrictEqual(config.allConfig, testenv1Expect)
+
+            process.env.NODE_ENV = 'testenv2'
+            config = new SMConfig(params)
+            assert.deepStrictEqual(config.allConfig, testenv2Expect)
+        })
+
+        it('Configuration: overwrite at runtime with environmental variables', () => {
+            process.env.APPSETTING_WHEN = 'runtime' // New
+            process.env.APPSETTING_FIRST = 'overwrite' // Overwrite
+            process.env.APPSETTING_INT_NUM = '-8' // camelCase
+
+            let expect = SMHelper.cloneObject(testenv2Expect)
+            expect.when = 'runtime'
+            expect.first = 'overwrite'
+            expect.intNum = -8
+
+            let config = new SMConfig(params, 'testenv2')
+            assert.deepStrictEqual(config.allConfig, expect)
+        })
+
+        it('Configuration: overwrite at runtime with environmental variables (custom prefix)', () => {
+            process.env.SET_WHEN = 'runtime-again' // New
+            process.env.SET_FOO = 'overwrite-2' // Overwrite
+            process.env.SET_SOME_FLOAT = '19.91' // camelCase
+
+            let expect = SMHelper.cloneObject(params.default)
+            expect.when = 'runtime-again'
+            expect.foo = 'overwrite-2'
+            expect.someFloat = 19.91
+
+            let config = new SMConfig(params, 'default', 'SET_')
+            assert.deepStrictEqual(config.allConfig, expect)
         })
     })
 })
